@@ -1,8 +1,9 @@
-import { Form, Input, Button, Checkbox } from "antd";
+import { Form, Input, Button, Checkbox, message } from "antd";
 import { useState, useEffect } from "react";
 import "./index.css";
 import qs from "qs";
 import axios from "axios";
+import { Redirect, RouteComponentProps } from "react-router-dom";
 const layout = {
   labelCol: {
     span: 8,
@@ -20,6 +21,7 @@ const tailLayout = {
 
 const App: React.FC = () => {
   useEffect(() => {}, []);
+  const [isLogin, setIsLogin] = useState(false);
   const onFinish = (values: any) => {
     console.log("Success:", values);
     axios
@@ -30,12 +32,16 @@ const App: React.FC = () => {
         }),
         {
           headers: {
-            "Content-type": "application/x-www-form-urlencode",
+            "Content-Type": "application/x-www-form-urlencoded",
           },
         }
       )
       .then((res) => {
-        console.log(res);
+        if (res.data?.data) {
+          setIsLogin(true);
+        } else {
+          message.error("登录失败");
+        }
       });
   };
 
@@ -43,7 +49,9 @@ const App: React.FC = () => {
     console.log("Failed:", errorInfo);
   };
 
-  return (
+  return isLogin ? (
+    <Redirect to="/" />
+  ) : (
     <div className="container">
       <Form
         {...layout}
